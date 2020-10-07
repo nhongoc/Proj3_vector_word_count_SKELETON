@@ -1,57 +1,68 @@
+#include <algorithm>
 #include "../includes/array_functions.h"
+#include "../includes/utilities.h"
+#include "../includes/fileio.h"
+
 using namespace std;
 
-void clear(std::vector<constants::entry>  &entries) {
+bool compareAscending(const constants::entry& entry1, const constants::entry& entry2) {
+	return entry1.word < entry2.word;
+}
+
+bool compareDescending(const constants::entry& entry1, const constants::entry& entry2) {
+	return entry1.word > entry2.word;
+}
+
+bool compareNumberOccurences(const constants::entry& entry1, const constants::entry& entry2) {
+	return entry1.number_occurences < entry2.number_occurences;
+}
+
+void KP::clear(std::vector<constants::entry>  &entries) {
 	entries.clear();
 }
 
-int getSize(std::vector<constants::entry>  &entries) {
+int KP::getSize(std::vector<constants::entry>  &entries) {
 	return entries.size();
 }
 
-std::string getWordAt(std::vector<constants::entry>  &entries, int i) {
+std::string KP::getWordAt(std::vector<constants::entry>  &entries, int i) {
 	return entries[i].word;
 }
 
-int getNumbOccurAt(std::vector<constants::entry>  &entries,int i) {
+int KP::getNumbOccurAt(std::vector<constants::entry>  &entries,int i) {
 	return entries[i].number_occurences;
 }
 
-bool processFile(std::vector<constants::entry>  &entries,std::fstream &myfstream) {
-	if (!myfstream.is_open()) {
-		return false;
-	}
+bool KP::processFile(std::vector<constants::entry>  &entries,std::fstream &myfstream) {
+	openFile(myfstream, constants::TEST_DATA_FULL.c_str());
 	string line;
 	while (!myfstream.eof()) {
 		getline(myfstream, line);
-		KP::processLine(entries, line);
+		processLine(entries, line);
 	}
+	closeFile(myfstream);
 	return true;
 }
 
-void processLine(std::vector<constants::entry>  &entries,std::string &myString) {
-	string word = "";
-	for (char x: myString) {
-		if (x != constants::CHAR_TO_SEARCH_FOR || !ispunct(x)) {
-			word += x;
-		}
-		else {
-			KP::processToken(entries, word);
-		}
+void KP::processLine(std::vector<constants::entry>  &entries,std::string &myString) {
+	strip_unwanted_chars(myString);
+	stringstream ss(myString);
+	string word;
+	while (getline(ss, word, constants::CHAR_TO_SEARCH_FOR)) {
+		processToken(entries, word);
 	}
 }
 
-void processToken(std::vector<constants::entry>  &entries,std::string &token) {
+void KP::processToken(std::vector<constants::entry>  &entries,std::string &token) {
 	constants::entry newEntry;
 	string wordUpper = token;
-	for (int i = 0; i < wordUpper.length(); i++) {
-		wordUpper[i] = toupper(wordUpper[i]);
-	}
-	for (constants::entry entry: entries) {
-		if (entry.word_uppercase == wordUpper) {
-			entry.number_occurences += 1;
+	toUpper(wordUpper);
+	for (unsigned int i = 0; i < entries.size(); i++) {
+		if (entries[i].word_uppercase.compare(wordUpper) == 0) {
+			entries[i].number_occurences += 1;
+			break;
 		}
-		else {
+		else if (i == entries.size() - 1) {
 			newEntry.word = token;
 			newEntry.word_uppercase = wordUpper;
 			newEntry.number_occurences = 1;
@@ -60,19 +71,18 @@ void processToken(std::vector<constants::entry>  &entries,std::string &token) {
 	}
 }
 
-void sort(std::vector<constants::entry>  &entries, constants::sortOrder so) {
+void KP::sort(std::vector<constants::entry>  &entries, constants::sortOrder so) {
 	switch(so) {
 	case constants::ASCENDING:
-		std::sort(entries.begin(), entries.end());
+		sort(entries.begin(), entries.end(), compareAscending);
 		break;
 	case constants::DESCENDING:
-		std::sort(entries.begin(), entries.end());
-		std::reverse(entries.begin(), entries.end());
+		sort(entries.begin(), entries.end(), compareDescending);
 		break;
 	case constants::NONE:
 		break;
 	case constants::NUMBER_OCCURRENCES:
-		std::sort(entries.begin(), entries.end());
+		sort(entries.begin(), entries.end(), compareNumberOccurences);
 		break;
 	}
 }

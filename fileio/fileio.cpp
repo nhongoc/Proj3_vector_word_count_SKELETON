@@ -1,13 +1,11 @@
 #include "../includes/fileio.h"
+#include "../includes/utilities.h"
 using namespace std;
 
 bool openFile(std::fstream& myfile, const std::string& myFileName,
-		std::ios_base::openmode mode = std::ios_base::in) {
+		std::ios_base::openmode mode) {
 	myfile.open(myFileName.c_str(), mode);
-	if (!myfile.is_open()) {
-		return false;
-	}
-	return true;
+	return does_file_exist(myFileName);
 }
 
 void closeFile(std::fstream& myfile) {
@@ -17,14 +15,11 @@ void closeFile(std::fstream& myfile) {
 }
 
 int writetoFile(std::vector<constants::entry>  &entries, const std::string &outputfilename) {
-	ofstream myOutputfile;
-	myOutputfile.open(outputfilename);
-	if (!myOutputfile.is_open()) {
-		return constants::FAIL_FILE_DID_NOT_OPEN;
-	}
+	fstream myOutputfile;
+	openFile(myOutputfile, outputfilename, std::ios_base::out);
 	for (unsigned int i = 0; i < entries.size(); i++) {
-		myOutputfile << entries[i].word << " " << entries[i].number_occurences << endl;
+		myOutputfile << entries[i].word << " " << intToString(entries[i].number_occurences) << endl;
 	}
-	myOutputfile.close();
+	closeFile(myOutputfile);
 	return constants::SUCCESS;
 }
