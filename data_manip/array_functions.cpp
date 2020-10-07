@@ -61,5 +61,18 @@ void processToken(std::vector<constants::entry>  &entries,std::string &token) {
 }
 
 void sort(std::vector<constants::entry>  &entries, constants::sortOrder so) {
-
+	switch(so) {
+	case constants::ASCENDING:
+		std::sort(entries.begin(), entries.end());
+		break;
+	case constants::DESCENDING:
+		std::sort(entries.begin(), entries.end());
+		std::reverse(entries.begin(), entries.end());
+		break;
+	case constants::NONE:
+		break;
+	case constants::NUMBER_OCCURRENCES:
+		std::sort(entries.begin(), entries.end());
+		break;
+	}
 }
