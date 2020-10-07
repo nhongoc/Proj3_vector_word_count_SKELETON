@@ -32,7 +32,7 @@ bool processFile(std::vector<constants::entry>  &entries,std::fstream &myfstream
 void processLine(std::vector<constants::entry>  &entries,std::string &myString) {
 	string word = "";
 	for (char x: myString) {
-		if (x != ' ' || !ispunct(x)) {
+		if (x != constants::CHAR_TO_SEARCH_FOR || !ispunct(x)) {
 			word += x;
 		}
 		else {

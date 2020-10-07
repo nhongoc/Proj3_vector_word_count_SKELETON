@@ -21,7 +21,7 @@ int writetoFile(std::vector<constants::entry>  &entries, const std::string &outp
 		return constants::FAIL_FILE_DID_NOT_OPEN;
 	}
 	for (int i = 0; i < entries.size(); i++) {
-		myOutputfile << entries[i] << endl;
+		myOutputfile << entries[i].word << " " << entries[i].number_occurences << endl;
 	}
 	myOutputfile.close();
 	return constants::SUCCESS;
