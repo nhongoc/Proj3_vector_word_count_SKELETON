@@ -6,11 +6,11 @@
 using namespace std;
 
 bool compareAscending(const constants::entry& entry1, const constants::entry& entry2) {
-	return entry1.word < entry2.word;
+	return entry1.word_uppercase < entry2.word_uppercase;
 }
 
 bool compareDescending(const constants::entry& entry1, const constants::entry& entry2) {
-	return entry1.word > entry2.word;
+	return entry1.word_uppercase > entry2.word_uppercase;
 }
 
 bool compareNumberOccurences(const constants::entry& entry1, const constants::entry& entry2) {
