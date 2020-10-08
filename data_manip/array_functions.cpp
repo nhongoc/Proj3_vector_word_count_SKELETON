@@ -14,7 +14,7 @@ bool compareDescending(const constants::entry& entry1, const constants::entry& e
 }
 
 bool compareNumberOccurences(const constants::entry& entry1, const constants::entry& entry2) {
-	return entry1.number_occurences < entry2.number_occurences;
+	return entry1.number_occurences > entry2.number_occurences;
 }
 
 void KP::clear(std::vector<constants::entry>  &entries) {
@@ -34,18 +34,19 @@ int KP::getNumbOccurAt(std::vector<constants::entry>  &entries,int i) {
 }
 
 bool KP::processFile(std::vector<constants::entry>  &entries,std::fstream &myfstream) {
-	openFile(myfstream, constants::TEST_DATA_FULL.c_str());
-	string line;
-	while (!myfstream.eof()) {
-		getline(myfstream, line);
-		processLine(entries, line);
+	if (myfstream.is_open()) {
+		string line;
+		while (!myfstream.eof()) {
+			getline(myfstream, line);
+			processLine(entries, line);
+		}
+		closeFile(myfstream);
+		return true;
 	}
-	closeFile(myfstream);
-	return true;
+	return false;
 }
 
 void KP::processLine(std::vector<constants::entry>  &entries,std::string &myString) {
-	strip_unwanted_chars(myString);
 	stringstream ss(myString);
 	string word;
 	while (getline(ss, word, constants::CHAR_TO_SEARCH_FOR)) {
@@ -55,19 +56,20 @@ void KP::processLine(std::vector<constants::entry>  &entries,std::string &myStri
 
 void KP::processToken(std::vector<constants::entry>  &entries,std::string &token) {
 	constants::entry newEntry;
+	strip_unwanted_chars(token);
 	string wordUpper = token;
 	toUpper(wordUpper);
 	for (unsigned int i = 0; i < entries.size(); i++) {
-		if (entries[i].word_uppercase.compare(wordUpper) == 0) {
+		if (entries[i].word_uppercase == wordUpper) {
 			entries[i].number_occurences += 1;
-			break;
+			return;
 		}
-		else if (i == entries.size() - 1) {
-			newEntry.word = token;
-			newEntry.word_uppercase = wordUpper;
-			newEntry.number_occurences = 1;
-			entries.push_back(newEntry);
-		}
+	}
+	if (token != "") {
+		newEntry.word = token;
+		newEntry.number_occurences = 1;
+		newEntry.word_uppercase = wordUpper;
+		entries.push_back(newEntry);
 	}
 }
 
